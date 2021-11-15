@@ -140,7 +140,7 @@ describe('Basic user flow for Website', () => {
     console.log('Checking number of items in cart on screen after reload...');
     // TODO - Step 7
     // Reload the page once more, then go through each <product-item> to make sure that it has remembered nothing
-        page.reload();
+        await page.reload();
         const prodItems = await page.$$('product-item');
     let shadowRoot;
     let button;
