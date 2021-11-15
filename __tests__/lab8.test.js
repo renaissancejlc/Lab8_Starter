@@ -50,9 +50,9 @@ describe('Basic user flow for Website', () => {
     console.log('Checking the "Add to Cart" button...');
     // TODO - Step 2
     // Query a <product-item> element using puppeteer ( checkout page.$() and page.$$() in the docs )
-    const prodItem = await page.$$('product-item');
+    const prodItems = await page.$$('product-item');
     // Grab the shadowRoot of that element (it's a property), then query a button from that shadowRoot.
-    const shadowRoot = await prodItem[0].getProperty('shadowRoot');
+    const shadowRoot = await prodItems[0].getProperty('shadowRoot');
     const button = await shadowRoot.$('button');
     // Once you have the button, you can click it and check the innerText property of the button.
     await button.click();
@@ -60,7 +60,7 @@ describe('Basic user flow for Website', () => {
     // Once you have the innerText property, use innerText['_remoteObject'].value to get the text value of it
     const textValue = innerText['_remoteObject'].value;
     expect(textValue).toBe("Remove from Cart");
-  }, 2500);
+  }, 5000);
 
   // Check to make sure that after clicking "Add to Cart" on every <product-item> that the Cart
   // number in the top right has been correctly updated
@@ -68,9 +68,9 @@ describe('Basic user flow for Website', () => {
     console.log('Checking number of items in cart on screen...');
     // TODO - Step 3
     // Query select all of the <product-item> elements, then for every single product element
-    const prodItem = await page.$$('product-item');
-    for (let i = 1; i < prodItem.length; i++){
-      let shadowRoot = await prodItem[i].getProperty('shadowRoot');
+    const prodItems = await page.$$('product-item');
+    for (let i = 1; i < prodItems.length; i++){
+      let shadowRoot = await prodItems[i].getProperty('shadowRoot');
       let button = await shadowRoot.$('button');
       await button.click();
     }
@@ -80,20 +80,19 @@ describe('Basic user flow for Website', () => {
     const textValue = innerText['_remoteObject'].value;
     expect(textValue).toBe("20");
     // Check to see if the innerText of #cart-count is 20*/
-  }, 10000);
+  }, 20000);
 
   // Check to make sure that after you reload the page it remembers all of the items in your cart
   it('Checking number of items in cart on screen after reload', async () => {
     console.log('Checking number of items in cart on screen after reload...');
     // TODO - Step 4
     // Reload the page, then select all of the <product-item> elements, and check every
-    await page.reload(); //https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagereloadoptions
+    await page.reload(); 
     const prodItems = await page.$$('product-item');
-    let cartCount = await page.$('#cart-count'); //to select an ID you have to have the #
+    let cartCount = await page.$('#cart-count');
     for(let i = 0; i < prodItems.length; i++)
     {
-      const item = prodItems[i];
-      let shadowRoot = await item.getProperty('shadowRoot');
+      let shadowRoot = await prodItems[i].getProperty('shadowRoot');
       let button = await shadowRoot.$('button');
       let innerText = await button.getProperty('innerText');
       expect(innerText['_remoteObject'].value).toBe('Remove from Cart');
@@ -101,15 +100,14 @@ describe('Basic user flow for Website', () => {
 
     let count = await cartCount.getProperty('innerText');
     expect(count['_remoteObject'].value).toBe('20');
-  }, 10000);
+  }, 20000);
 
   // Check to make sure that the cart in localStorage is what you expect
   it('Checking the localStorage to make sure cart is correct', async () => {
     // TODO - Step 5
     // At this point he item 'cart' in localStorage should be 
     const cart = await page.evaluate(async () =>{
-      storage =  window.localStorage.getItem("cart");
-      return storage;
+      return  window.localStorage.getItem("cart");
     })
     expect(cart).toBe("[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]");
     // '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]', check to make sure it is
@@ -125,8 +123,7 @@ describe('Basic user flow for Website', () => {
     let cartCount = await page.$('#cart-count'); //to select an ID you have to have the #
     for(let i= 0; i<prodItems.length; i++)
     {
-      let item = prodItems[i];
-      let shadowRoot = await item.getProperty("shadowRoot");
+      let shadowRoot = await prodItems[i].getProperty("shadowRoot");
       let button = await shadowRoot.$("button");
       let innerText = await button.getProperty('innerText');
       await button.click();
@@ -135,7 +132,7 @@ describe('Basic user flow for Website', () => {
     let count = await cartCount.getProperty('innerText');
     // Once you have, check to make sure that #cart-count is now 0
     expect(count['_remoteObject'].value).toBe('0');
-  }, 10000);
+  }, 20000);
 
   // Checking to make sure that it remembers us removing everything from the cart
   // after we refresh the page
@@ -144,11 +141,11 @@ describe('Basic user flow for Website', () => {
     // TODO - Step 7
     // Reload the page once more, then go through each <product-item> to make sure that it has remembered nothing
         page.reload();
-        const prodItem = await page.$$('product-item');
+        const prodItems = await page.$$('product-item');
     let shadowRoot;
     let button;
-    for (let i =0; i<prodItem.length; i++){
-      shadowRoot = await prodItem[i].getProperty('shadowRoot');
+    for (let i =0; i<prodItems.length; i++){
+      shadowRoot = await prodItems[i].getProperty('shadowRoot');
       button = await shadowRoot.$('button');
       const innerText = await button.getProperty('innerText');
     const textValue = await innerText['_remoteObject'].value;
@@ -170,9 +167,8 @@ describe('Basic user flow for Website', () => {
     console.log('Checking the localStorage...');
     // TODO - Step 8
     const cart = await page.evaluate(async () =>{
-      let storage =  window.localStorage.getItem('cart');
-      return storage;
-    })
+      return window.localStorage.getItem('cart');
+        })
     expect(cart).toBe('[]');
   });
 });
